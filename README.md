@@ -11,6 +11,7 @@ This library provides 2 FreeRTOS versions:
    * [10.0.1](https://github.com/STMicroelectronics/stm32_mw_freertos/releases/tag/v10.0.1) 
    * [10.2.1](https://github.com/STMicroelectronics/stm32_mw_freertos/releases/tag/v10.2.1)
    * [10.3.1](https://github.com/STMicroelectronics/stm32_mw_freertos/releases/tag/v10.3.1)
+   * [10.4.6](https://github.com/STMicroelectronics/stm32_mw_freertos/releases/tag/v10.4.6)
 
 Each have been modified by ST (See st_readme.txt in FreeRTOS Source).
 
@@ -41,11 +42,7 @@ By default, the `heap_useNewlib.c` is used. It can be changed thanks a define in
  */
 ```
 
-Since v10.0.1, CMSIS-RTOSv2 can be used instead of default CMSIS-RTOS.
-
-`configUSE_CMSIS_RTOS_V2` has to be defined and set to `1` to use
-CMSIS-RTOSv2.
-
+Since v10.4.6, the default CMSIS-RTOS has been removed and replaced by CMSIS-RTOSv2.
 
 ## Limitations
 
