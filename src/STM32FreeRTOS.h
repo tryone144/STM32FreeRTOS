@@ -7,6 +7,11 @@
 #define _STM32FREERTOS_H_
 
 #include "FreeRTOS.h"
+#include "task.h"
+#include "timers.h"
+#include "queue.h"
+#include "semphr.h"
+#include "portmacro.h"
 #include "cmsis_os2.h"
 
 #endif //_STM32FREERTOS_H_
