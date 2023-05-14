@@ -48,9 +48,6 @@
  */
 /*#define configMEMMANG_HEAP_NB             3*/
 
-/* configUSE_CMSIS_RTOS_V2 has to be defined and set to 1 to use CMSIS-RTOSv2 */
-/*#define configUSE_CMSIS_RTOS_V2           1*/
-
 /* End custom definitions for STM32 */
 
 /* Ensure stdint is only used by the compiler, and not the assembler. */
@@ -59,61 +56,32 @@
  extern uint32_t SystemCoreClock;
 #endif
 
-#if defined(configUSE_CMSIS_RTOS_V2) && (configUSE_CMSIS_RTOS_V2 == 1)
-/*------------- CMSIS-RTOS V2 specific defines -----------*/
-/* When using CMSIS-RTOSv2 set configSUPPORT_STATIC_ALLOCATION to 1
- * is mandatory to avoid compile errors.
- * CMSIS-RTOS V2 implmentation requires the following defines
- */
-/* cmsis_os threads are created using xTaskCreateStatic() API */
-#define configSUPPORT_STATIC_ALLOCATION   1
-/*  CMSIS-RTOSv2 defines 56 levels of priorities. To be able to use them
- *  all and avoid application misbehavior, configUSE_PORT_OPTIMISED_TASK_SELECTION
- *  must be set to 0 and configMAX_PRIORITIES to 56
- *
- */
-#define configMAX_PRIORITIES              (56)
-/*
- * When set to 1, configMAX_PRIORITIES can't be more than 32
- * which is not suitable for the new CMSIS-RTOS v2 priority range
- */
-#define configUSE_PORT_OPTIMISED_TASK_SELECTION 0
-/* Require to be a value as used in cmsis_os2.c as array size */
-#ifndef configMINIMAL_STACK_SIZE
-#define configMINIMAL_STACK_SIZE          ((uint16_t)128)
-#endif
-
+/*-------------------- specific defines -------------------*/
 #if !defined(CMSIS_device_header)
 /* CMSIS_device_header defined to stm32_def.h by default, which include <device.h> like stm32f1xx.h */
 #define CMSIS_device_header  "stm32_def.h"
 #endif /* CMSIS_device_header */
-#else
-#define configMAX_PRIORITIES              (7)
-#endif /* configUSE_CMSIS_RTOS_V2 */
 
-extern char _end; /* Defined in the linker script */
-extern char _estack; /* Defined in the linker script */
-extern char _Min_Stack_Size; /* Defined in the linker script */
-/*
- * _Min_Stack_Size is often set to 0x400 in the linker script
- * Use it divided by 8 to set minmimal stack size of a task to 128 by default.
- * End user will have to properly configure those value depending to their needs.
- */
-#ifndef configMINIMAL_STACK_SIZE
-#define configMINIMAL_STACK_SIZE          ((uint16_t)((uint32_t)&_Min_Stack_Size/8))
-#endif
-#ifndef configTOTAL_HEAP_SIZE
-#define configTOTAL_HEAP_SIZE             ((size_t)((uint32_t)&_estack - (uint32_t)&_Min_Stack_Size - (uint32_t)&_end))
-#endif
-#ifndef configISR_STACK_SIZE_WORDS
-#define configISR_STACK_SIZE_WORDS        ((uint32_t)&_Min_Stack_Size/4)
-#endif
+/* Set configENABLE_TRUSTZONE to 1 enable TrustZone support and 0 to disable it.
+   This is currently used in ARMv8M ports. */
+#define configENABLE_TRUSTZONE            0
+/* Set configENABLE_FPU to 1 to enable FPU support and 0 to disable it. This is
+   currently used in ARMv8M ports. */
+#define configENABLE_FPU                  1
+/* Set configENABLE_MPU to 1 to enable MPU support and 0 to disable it. This is
+   currently used in ARMv8M ports. */
+#define configENABLE_MPU                  0
+
+/*-----------------------------------------------------------------*/
 
 #define configUSE_PREEMPTION              1
 #define configUSE_IDLE_HOOK               1
 #define configUSE_TICK_HOOK               1
 #define configCPU_CLOCK_HZ                (SystemCoreClock)
 #define configTICK_RATE_HZ                ((TickType_t)1000)
+#define configMINIMAL_STACK_SIZE          ((uint16_t)128)
+#define configTOTAL_HEAP_SIZE             ((size_t)(15 * 1024))
+#define configISR_STACK_SIZE_WORDS        (0x100)
 #define configMAX_TASK_NAME_LEN           (16)
 #define configUSE_TRACE_FACILITY          1
 #define configUSE_16_BIT_TICKS            0
@@ -139,16 +107,6 @@ extern char _Min_Stack_Size; /* Defined in the linker script */
  */
 #define configUSE_NEWLIB_REENTRANT        1
 
-/* Set configENABLE_MPU to 1 to enable MPU support and 0 to disable it. This is
-currently used in ARMv8M ports. */
-#define configENABLE_MPU                  0
-/* Set configENABLE_FPU to 1 to enable FPU support and 0 to disable it. This is
-currently used in ARMv8M ports. */
-#define configENABLE_FPU                  1
-/* Set configENABLE_TRUSTZONE to 1 enable TrustZone support and 0 to disable it.
-This is currently used in ARMv8M ports. */
-#define configENABLE_TRUSTZONE            0
-
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES             0
 #define configMAX_CO_ROUTINE_PRIORITIES  (2)
@@ -159,6 +117,9 @@ This is currently used in ARMv8M ports. */
 #define configTIMER_QUEUE_LENGTH         10
 #define configTIMER_TASK_STACK_DEPTH    (configMINIMAL_STACK_SIZE * 2)
 
+/* ARMv8-M secure side port related definitions. */
+/* #define secureconfigMAX_SECURE_CONTEXTS         5 */
+
 /* Set the following definitions to 1 to include the API function, or zero
 to exclude the API function. */
 #define INCLUDE_vTaskPrioritySet          1
@@ -166,17 +127,42 @@ to exclude the API function. */
 #define INCLUDE_vTaskDelete               1
 #define INCLUDE_vTaskCleanUpResources     1
 #define INCLUDE_vTaskSuspend              1
-#define INCLUDE_vTaskDelayUntil           1
+#define INCLUDE_xTaskDelayUntil           1
 #define INCLUDE_vTaskDelay                1
 #define INCLUDE_xTaskGetSchedulerState    1
-#define INCLUDE_uxTaskGetStackHighWaterMark 1
-#define INCLUDE_xTaskGetIdleTaskHandle    1
 
-#if defined(configUSE_CMSIS_RTOS_V2) && (configUSE_CMSIS_RTOS_V2 == 1)
+
+/* Optional functions - most linkers will remove unused functions anyway. */
 #define INCLUDE_xSemaphoreGetMutexHolder  1
 #define INCLUDE_eTaskGetState             1
+#define INCLUDE_uxTaskGetStackHighWaterMark 1
 #define INCLUDE_xTimerPendFunctionCall    1
 #define INCLUDE_xTaskGetCurrentTaskHandle 1
+#define INCLUDE_xTaskGetIdleTaskHandle    1
+
+/*------------- CMSIS-RTOS V2 specific defines -----------*/
+/* When using CMSIS-RTOSv2 set configSUPPORT_STATIC_ALLOCATION to 1
+ * is mandatory to avoid compile errors.
+ * CMSIS-RTOS V2 implmentation requires the following defines
+ */
+#define configSUPPORT_STATIC_ALLOCATION          1   /* cmsis_os threads are created using xTaskCreateStatic() API */
+#define configMAX_PRIORITIES                     (56) /* Priority range in CMSIS-RTOS V2 is [0 .. 56] */
+#define configUSE_PORT_OPTIMISED_TASK_SELECTION  0    /* when set to 1, configMAX_PRIORITIES can't be more than 32 which is not suitable for the new CMSIS-RTOS v2 priority range */
+
+
+/* the CMSIS-RTOS V2 FreeRTOS wrapper is dependent on the heap implementation used
+ * by the application thus the correct define need to be enabled from the list
+ * below. */
+#if (configMEMMANG_HEAP_NB == 1)
+#define USE_FreeRTOS_HEAP_1
+#elif (configMEMMANG_HEAP_NB == 2)
+#define USE_FreeRTOS_HEAP_2
+#elif (configMEMMANG_HEAP_NB == 3)
+#define USE_FreeRTOS_HEAP_3
+#elif (configMEMMANG_HEAP_NB == 4)
+#define USE_FreeRTOS_HEAP_4
+#elif (configMEMMANG_HEAP_NB == 5)
+#define USE_FreeRTOS_HEAP_5
 #endif
 
 /* Cortex-M specific definitions. */
