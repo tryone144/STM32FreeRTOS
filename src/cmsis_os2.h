@@ -1,5 +1,5 @@
 /*
- * @file    cmsis_os.h
+ * @file    cmsis_os2.h
  * @author  Frederic Pillon <frederic.pillon@st.com> for STMicroelectronics.
  * @brief   Include header file to match Arduino library format
  */
@@ -8,10 +8,6 @@
 
 #include "FreeRTOS.h"
 
-#if !defined(configUSE_CMSIS_RTOS_V2) || (configUSE_CMSIS_RTOS_V2 == 0)
-#include "../portable/CMSIS_RTOS/cmsis_os.h"
-#else
-#include "../portable/CMSIS_RTOS_V2/cmsis_os.h"
-#endif
+#include "../portable/CMSIS_RTOS_V2/cmsis_os2.h"
 
 #endif //_ARDUINO_CMSIS_OS_H_

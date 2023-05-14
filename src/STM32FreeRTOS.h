@@ -7,6 +7,6 @@
 #define _STM32FREERTOS_H_
 
 #include "FreeRTOS.h"
-#include "cmsis_os.h"
+#include "cmsis_os2.h"
 
 #endif //_STM32FREERTOS_H_
